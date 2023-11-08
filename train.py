@@ -16,9 +16,9 @@ from transformers import get_linear_schedule_with_warmup
 
 
 
-checkpoint = "THUDM/chatglm-6b"
+# checkpoint = "THUDM/chatglm-6b"
 
-model_id = "finetune_test"
+# model_id = "finetune_test"
 
 mixed_precision = 'bf16'
 lora_config = {
@@ -41,6 +41,7 @@ deepspeed_plugin = DeepSpeedPlugin(gradient_accumulation_steps=accumulate_step)
 accelerator = Accelerator(mixed_precision=mixed_precision, deepspeed_plugin=deepspeed_plugin, log_with="tensorboard", project_dir='runs/')
 device = accelerator.device
 
+PATH = '../../../ops/zaifan'
 
 with accelerator.main_process_first():
     retry_cnt = 10
@@ -48,8 +49,8 @@ with accelerator.main_process_first():
     while cnt < retry_cnt:
         try:
             import dataset.GLM
-            tokenizer = AutoTokenizer.from_pretrained(checkpoint, trust_remote_code=True, revision = 'main')
-            model = AutoModel.from_pretrained(checkpoint, trust_remote_code=True, revision = 'main')
+            tokenizer = AutoTokenizer.from_pretrained(PATH, local_files_only=True)
+            model = AutoModel.from_pretrained(PATH, local_files_only=True)
             if mixed_precision == None:
                 model = model.float()
             break
